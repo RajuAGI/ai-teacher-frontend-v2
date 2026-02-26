@@ -543,23 +543,27 @@
       const question = document.getElementById("questionInput").value.trim();
       if (!question) return;
 
-      // Show answer section loading
       document.getElementById("answerSection").style.display = "block";
       document.getElementById("answerText").innerHTML = '<div style="display:flex;align-items:center;gap:10px"><div class="spinner"></div> सोच रहा हूं...</div>';
       document.getElementById("searchSource").innerText = "";
 
-      // Auto-search the same query
       autoSearch(question);
 
       try {
         const data = await api("/ask", "POST", { question });
-        document.getElementById("answerText").innerText = data.answer || data.error || "जवाब नहीं मिला";
+        const answer = data.answer || data.error || "जवाब नहीं मिला";
+        document.getElementById("answerText").innerText = answer;
         if (data.source) document.getElementById("searchSource").innerText = "🔍 " + data.source;
 
-        // Play audio
-        if (data.audio) {
-          playAudio(data.audio);
-        }
+        // Audio alag fetch karo (non-blocking)
+        fetch(`${BACKEND}/tts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: answer.substring(0, 300) })
+        }).then(r => r.json()).then(d => {
+          if (d.audio) playAudio(d.audio);
+        }).catch(() => {});
+
       } catch (e) {
         document.getElementById("answerText").innerHTML = '❌ Backend से connect नहीं हो पाया। <button class="btn btn-sm btn-primary" onclick="askTeacher()" style="margin-left:10px">🔄 Retry</button>';
       }
