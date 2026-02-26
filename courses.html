@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses — AI Teacher</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .courses-layout { display:grid; grid-template-columns:280px 1fr; gap:24px; }
+    .sidebar { background:var(--dark2); border:1px solid var(--border); border-radius:14px; padding:16px; height:fit-content; position:sticky; top:82px; }
+    .sidebar h3 { font-size:14px; font-weight:700; color:var(--muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; }
+    .course-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:10px; border:none; background:transparent; color:var(--text); cursor:pointer; font-size:14px; font-weight:600; font-family:'Hind',sans-serif; text-align:left; transition:all 0.2s; margin-bottom:4px; }
+    .course-btn:hover  { background:var(--dark3); }
+    .course-btn.active { background:var(--primary); color:white; }
+    .add-course-btn { border:1px dashed var(--border); color:var(--muted); justify-content:center; font-weight:500; }
+    .add-course-btn:hover { border-color:var(--primary); color:var(--primary); background:rgba(233,69,96,0.08); }
+    .divider-line { border:none; border-top:1px solid var(--border); margin:12px 0; }
+    .topics-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:14px; margin-bottom:24px; }
+    .topic-card { background:var(--dark3); border:1px solid var(--border); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s; }
+    .topic-card:hover { border-color:var(--primary); transform:translateY(-2px); }
+    .topic-card .icon { font-size:30px; margin-bottom:8px; }
+    .topic-card h4 { font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .topic-card p  { font-size:12px; color:var(--muted); }
+    .topic-card.user-added { border-color:var(--gold); background:rgba(244,196,48,0.05); }
+    .explain-panel { background:var(--dark2); border:1px solid var(--border); border-radius:14px; padding:24px; display:none; }
+    .explain-panel h2 { font-size:22px; margin-bottom:6px; }
+    .explain-panel .meta { font-size:13px; color:var(--muted); margin-bottom:16px; display:flex; gap:16px; flex-wrap:wrap; }
+    .explain-content { font-size:15px; line-height:1.9; color:var(--text); white-space:pre-wrap; }
+    .explain-content h1,h2,h3 { color:var(--primary); }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; align-items:center; justify-content:center; }
+    .modal-overlay.active { display:flex; }
+    .modal-box { background:var(--dark2); border:1px solid var(--border); border-radius:16px; padding:28px; width:90%; max-width:440px; }
+    .modal-box h3 { margin-bottom:20px; font-size:18px; }
+    .audio-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px; background:var(--dark3); border-radius:10px; padding:12px; }
+    .progress-bar { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; min-width:80px; }
+    .progress-fill { height:100%; background:var(--primary); width:0%; transition:width 0.3s; }
+    @media(max-width:768px){ .courses-layout{grid-template-columns:1fr} .sidebar{position:static} }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <main class="page-wrap">
+    <div class="page-header">
+      <h1>📚 Courses</h1>
+      <p>Topic चुनो → 1000+ शब्दों में explanation → आवाज़ में सुनो</p>
+    </div>
+
+    <div class="courses-layout">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <h3>📂 Subjects</h3>
+        <div id="courseList"></div>
+        <hr class="divider-line">
+        <button class="course-btn add-course-btn" onclick="openAddCourse()">＋ नया Subject</button>
+        <hr class="divider-line">
+        <h3>⭐ My Topics</h3>
+        <div id="myTopicList" style="font-size:13px;color:var(--muted)">Login करो dekhne ke liye</div>
+      </div>
+
+      <!-- MAIN AREA -->
+      <div>
+        <!-- Topics grid -->
+        <div id="topicsArea">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h2 id="courseTitle" style="font-size:20px">Subject चुनो</h2>
+            <button class="btn btn-outline btn-sm" onclick="openAddTopic()">＋ नया Topic</button>
+          </div>
+          <div class="topics-grid" id="topicsGrid">
+            <div style="color:var(--muted);font-size:14px;grid-column:1/-1">← Left से Subject चुनो</div>
+          </div>
+        </div>
+
+        <!-- Explain panel -->
+        <div class="explain-panel" id="explainPanel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <h2 id="explainTitle">Topic</h2>
+            <button class="btn btn-outline btn-sm" onclick="closeExplain()">✕ बंद करो</button>
+          </div>
+          <div class="meta">
+            <span id="explainCourse">📚</span>
+            <span id="explainWordCount">📝 1000+ words</span>
+          </div>
+
+          <!-- Audio controls -->
+          <div class="audio-bar" id="audioBar" style="display:none">
+            <button class="btn btn-sm btn-primary" onclick="toggleExplainAudio()">▶️ सुनो</button>
+            <div class="progress-bar"><div class="progress-fill" id="audioProg"></div></div>
+            <span id="audioStatus" style="font-size:12px;color:var(--muted)">Ready</span>
+            <button class="btn btn-sm btn-outline" onclick="stopExplainAudio()">⏹</button>
+            <button class="btn btn-sm btn-outline" onclick="speakBrowserExplain()">🗣️</button>
+          </div>
+
+          <div id="explainLoading" style="display:flex;align-items:center;gap:12px;padding:20px;color:var(--muted)">
+            <div class="spinner spinner-lg"></div>
+            <div>
+              <div style="font-weight:700;margin-bottom:4px">AI Explanation तैयार हो रही है...</div>
+              <div style="font-size:13px">1000+ शब्दों में detailed explanation आ रही है। 15-20 seconds लगेंगे।</div>
+            </div>
+          </div>
+          <div class="explain-content" id="explainContent" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Course Modal -->
+  <div class="modal-overlay" id="addCourseModal">
+    <div class="modal-box">
+      <h3>📂 नया Subject जोड़ो</h3>
+      <div class="input-group">
+        <label class="input-label">Subject का नाम</label>
+        <input class="input" id="newCourseName" placeholder="जैसे: इतिहास, Chemistry, English..." />
+      </div>
+      <div class="input-group">
+        <label class="input-label">Icon (Emoji)</label>
+        <input class="input" id="newCourseIcon" placeholder="📚" maxlength="4" value="📚" />
+      </div>
+      <div id="addCourseAlert" class="alert"></div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary" onclick="saveNewCourse()">जोड़ो</button>
+        <button class="btn btn-outline" onclick="document.getElementById('addCourseModal').classList.remove('active')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Topic Modal -->
+  <div class="modal-overlay" id="addTopicModal">
+    <div class="modal-box">
+      <h3>📝 नया Topic जोड़ो</h3>
+      <div class="input-group">
+        <label class="input-label">Topic का नाम</label>
+        <input class="input" id="newTopicName" placeholder="जैसे: प्रकाश संश्लेषण, Newton Laws..." />
+      </div>
+      <div id="addTopicAlert" class="alert"></div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary" onclick="saveNewTopic()">जोड़ो</button>
+        <button class="btn btn-outline" onclick="document.getElementById('addTopicModal').classList.remove('active')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+  <script src="nav.js"></script>
+  <script>
+    // ===== BUILT-IN COURSES =====
+    const BUILT_IN = [
+      { id:"science", name:"विज्ञान", icon:"🔬", topics:[
+        {name:"प्रकाश संश्लेषण",icon:"🌿"},{name:"Newton के नियम",icon:"⚙️"},
+        {name:"DNA और RNA",icon:"🧬"},{name:"Solar System",icon:"☀️"},
+        {name:"Chemical Reactions",icon:"⚗️"},{name:"Human Body",icon:"🫀"}]},
+      { id:"history", name:"इतिहास", icon:"🏛️", topics:[
+        {name:"मौर्य साम्राज्य",icon:"👑"},{name:"मुगल साम्राज्य",icon:"🕌"},
+        {name:"Independence Movement",icon:"🇮🇳"},{name:"World War II",icon:"🌍"},
+        {name:"Indus Valley Civilization",icon:"🏺"},{name:"Gupta Empire",icon:"📜"}]},
+      { id:"maths", name:"गणित", icon:"➗", topics:[
+        {name:"Quadratic Equations",icon:"📐"},{name:"Trigonometry",icon:"📏"},
+        {name:"Probability",icon:"🎲"},{name:"Statistics",icon:"📊"},
+        {name:"Calculus Basics",icon:"∫"},{name:"Geometry",icon:"📐"}]},
+      { id:"geography", name:"भूगोल", icon:"🌍", topics:[
+        {name:"भारत की नदियाँ",icon:"🌊"},{name:"Climate Change",icon:"🌡️"},
+        {name:"Tectonic Plates",icon:"⛰️"},{name:"Indian States",icon:"🗺️"},
+        {name:"Monsoon System",icon:"🌧️"},{name:"Natural Resources",icon:"💎"}]},
+      { id:"civics", name:"नागरिकशास्त्र", icon:"⚖️", topics:[
+        {name:"Indian Constitution",icon:"📜"},{name:"Parliament",icon:"🏛️"},
+        {name:"Fundamental Rights",icon:"🤝"},{name:"Supreme Court",icon:"⚖️"},
+        {name:"Panchayati Raj",icon:"🏘️"},{name:"Elections in India",icon:"🗳️"}]},
+      { id:"english", name:"English", icon:"🔤", topics:[
+        {name:"Grammar Basics",icon:"📝"},{name:"Essay Writing",icon:"✍️"},
+        {name:"Comprehension",icon:"📖"},{name:"Vocabulary",icon:"📚"},
+        {name:"Letter Writing",icon:"✉️"},{name:"Tenses",icon:"⏰"}]},
+    ];
+
+    let activeCourseId = null;
+    let currentTopic   = null;
+    let currentCourse  = null;
+    let explainAudio   = null;
+    let explainAudioCtx= null;
+    let fullExplainText= "";
+
+    // ===== USER COURSES (localStorage) =====
+    function getUserCourses() {
+      try { return JSON.parse(localStorage.getItem("at_courses")||"[]"); } catch { return []; }
+    }
+    function saveUserCourses(c) { localStorage.setItem("at_courses", JSON.stringify(c)); }
+
+    function getUserTopics(courseId) {
+      try { return JSON.parse(localStorage.getItem(`at_topics_${courseId}`)||"[]"); } catch { return []; }
+    }
+    function saveUserTopics(courseId, topics) { localStorage.setItem(`at_topics_${courseId}`, JSON.stringify(topics)); }
+
+    // ===== RENDER SIDEBAR =====
+    function renderSidebar() {
+      const list = document.getElementById("courseList");
+      list.innerHTML = "";
+      const userCourses = getUserCourses();
+      const allCourses  = [...BUILT_IN, ...userCourses];
+
+      allCourses.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = `course-btn${activeCourseId===c.id?" active":""}`;
+        btn.innerHTML = `${c.icon} ${c.name}`;
+        btn.onclick   = () => selectCourse(c);
+        list.appendChild(btn);
+      });
+
+      // My topics (user-added to any course)
+      const myBox = document.getElementById("myTopicList");
+      if (isLoggedIn()) {
+        const allUserTopics = allCourses.flatMap(c => 
+          getUserTopics(c.id).map(t => ({...t, courseName:c.name, courseId:c.id}))
+        );
+        if (!allUserTopics.length) {
+          myBox.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:6px">कोई topic नहीं जोड़ा अभी तक</div>`;
+        } else {
+          myBox.innerHTML = allUserTopics.map(t => 
+            `<button class="course-btn" style="font-size:12px" onclick="selectTopicDirect('${t.name}','${t.courseName}')">⭐ ${t.name}</button>`
+          ).join("");
+        }
+      }
+    }
+
+    function selectCourse(course) {
+      activeCourseId = course.id;
+      currentCourse  = course;
+      closeExplain();
+      document.getElementById("courseTitle").innerText = `${course.icon} ${course.name}`;
+
+      const userTopics  = getUserTopics(course.id).map(t => ({...t, isUser:true}));
+      const builtTopics = (course.topics||[]);
+      const all         = [...builtTopics, ...userTopics];
+
+      const grid = document.getElementById("topicsGrid");
+      grid.innerHTML = "";
+      all.forEach(t => {
+        const d = document.createElement("div");
+        d.className = `topic-card${t.isUser?" user-added":""}`;
+        d.innerHTML = `<div class="icon">${t.icon||"📝"}</div><h4>${t.name}</h4><p>${t.isUser?"⭐ आपका topic":"Tap करो → explain होगा"}</p>`;
+        d.onclick   = () => explainTopic(t.name, course.name);
+        grid.appendChild(d);
+      });
+      renderSidebar();
+    }
+
+    function selectTopicDirect(topicName, courseName) {
+      explainTopic(topicName, courseName);
+    }
+
+    // ===== EXPLAIN =====
+    async function explainTopic(topicName, courseName) {
+      currentTopic  = topicName;
+      document.getElementById("topicsArea").style.display    = "none";
+      document.getElementById("explainPanel").style.display  = "block";
+      document.getElementById("explainTitle").innerText       = topicName;
+      document.getElementById("explainCourse").innerText      = `📚 ${courseName}`;
+      document.getElementById("explainLoading").style.display = "flex";
+      document.getElementById("explainContent").style.display = "none";
+      document.getElementById("audioBar").style.display      = "none";
+      stopExplainAudio();
+      fullExplainText = "";
+
+      try {
+        const data = await api("/explain","POST",{topic:topicName, course:courseName});
+        if (data.error) throw new Error(data.error);
+        fullExplainText = data.text || "";
+        const words = fullExplainText.split(/\s+/).length;
+        document.getElementById("explainWordCount").innerText = `📝 ${words} words`;
+        document.getElementById("explainContent").innerText  = fullExplainText;
+        document.getElementById("explainLoading").style.display = "none";
+        document.getElementById("explainContent").style.display = "block";
+        document.getElementById("audioBar").style.display       = "flex";
+
+        if (data.audio) {
+          playExplainAudio(data.audio);
+        }
+      } catch (e) {
+        document.getElementById("explainLoading").innerHTML = `
+          <div>
+            <div style="color:var(--primary);font-weight:700">❌ ${e.message||"Error आया"}</div>
+            <button class="btn btn-sm btn-primary" onclick="explainTopic('${topicName}','${courseName}')" style="margin-top:10px">🔄 फिर Try करो</button>
+          </div>`;
+      }
+    }
+
+    function closeExplain() {
+      document.getElementById("topicsArea").style.display   = "block";
+      document.getElementById("explainPanel").style.display = "none";
+      stopExplainAudio();
+    }
+
+    // ===== AUDIO =====
+    function playExplainAudio(b64) {
+      stopExplainAudio();
+      explainAudio = new Audio("data:audio/mp3;base64," + b64);
+      explainAudio.playbackRate = 1.15;
+      explainAudio.ontimeupdate = () => {
+        const pct = (explainAudio.currentTime / explainAudio.duration * 100) || 0;
+        document.getElementById("audioProg").style.width = pct + "%";
+        document.getElementById("audioStatus").innerText = formatTime(explainAudio.currentTime) + " / " + formatTime(explainAudio.duration);
+      };
+      explainAudio.play().catch(()=>{});
+      document.querySelector("#audioBar button").innerHTML = "⏸ रुको";
+    }
+
+    function toggleExplainAudio() {
+      if (!explainAudio) return;
+      if (explainAudio.paused) { explainAudio.play(); document.querySelector("#audioBar button").innerHTML = "⏸ रुको"; }
+      else { explainAudio.pause(); document.querySelector("#audioBar button").innerHTML = "▶️ सुनो"; }
+    }
+
+    function stopExplainAudio() {
+      if (explainAudio) { explainAudio.pause(); explainAudio = null; }
+      document.getElementById("audioProg").style.width = "0%";
+    }
+
+    function speakBrowserExplain() {
+      if (!fullExplainText) return;
+      window.speechSynthesis.cancel();
+      const chunks = fullExplainText.match(/.{1,200}/gs)||[];
+      let i = 0;
+      function speakNext() {
+        if (i >= chunks.length) return;
+        const u = new SpeechSynthesisUtterance(chunks[i++]);
+        const voices = window.speechSynthesis.getVoices();
+        const hi = voices.find(v=>v.lang==="hi-IN")||voices.find(v=>v.lang.startsWith("hi"));
+        if (hi) u.voice = hi;
+        u.lang = "hi-IN"; u.rate = 0.85;
+        u.onend = speakNext;
+        window.speechSynthesis.speak(u);
+      }
+      speakNext();
+    }
+
+    function formatTime(s) {
+      if (!s || isNaN(s)) return "0:00";
+      return Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
+    }
+
+    // ===== ADD COURSE =====
+    function openAddCourse() {
+      if (!isLoggedIn()) { window.location.href="login.html"; return; }
+      document.getElementById("addCourseModal").classList.add("active");
+    }
+
+    function saveNewCourse() {
+      const name = document.getElementById("newCourseName").value.trim();
+      const icon = document.getElementById("newCourseIcon").value.trim()||"📚";
+      if (!name) { showAlert("addCourseAlert","नाम डालो","error"); return; }
+      const courses = getUserCourses();
+      const id = "user_"+Date.now();
+      courses.push({id, name, icon, topics:[]});
+      saveUserCourses(courses);
+      document.getElementById("addCourseModal").classList.remove("active");
+      document.getElementById("newCourseName").value="";
+      renderSidebar();
+    }
+
+    // ===== ADD TOPIC =====
+    function openAddTopic() {
+      if (!isLoggedIn()) { window.location.href="login.html"; return; }
+      if (!activeCourseId) { alert("पहले Subject चुनो"); return; }
+      document.getElementById("addTopicModal").classList.add("active");
+    }
+
+    function saveNewTopic() {
+      const name = document.getElementById("newTopicName").value.trim();
+      if (!name) { showAlert("addTopicAlert","Topic का नाम डालो","error"); return; }
+      const topics = getUserTopics(activeCourseId);
+      topics.push({name, icon:"⭐"});
+      saveUserTopics(activeCourseId, topics);
+      document.getElementById("addTopicModal").classList.remove("active");
+      document.getElementById("newTopicName").value="";
+      if (currentCourse) selectCourse(currentCourse);
+    }
+
+    // Close modals on overlay click
+    document.querySelectorAll(".modal-overlay").forEach(m => {
+      m.addEventListener("click", e => { if(e.target===m) m.classList.remove("active"); });
+    });
+
+    // Init
+    document.addEventListener("DOMContentLoaded", renderSidebar);
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — AI Teacher</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .about-hero { text-align:center; padding:40px 20px; }
+    .about-photo { width:130px; height:130px; border-radius:50%; border:4px solid var(--primary); object-fit:cover; margin:0 auto 16px; display:block; box-shadow:0 0 30px rgba(233,69,96,0.4); }
+    .about-name { font-size:28px; font-weight:800; }
+    .about-title { color:var(--muted); font-size:15px; margin-top:4px; }
+    .mission-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin:28px 0; }
+    .mission-card { background:var(--dark2); border:1px solid var(--border); border-radius:14px; padding:20px; }
+    .mission-card .icon { font-size:36px; margin-bottom:10px; }
+    .mission-card h3 { font-size:16px; font-weight:700; margin-bottom:6px; }
+    .mission-card p  { font-size:13px; color:var(--muted); line-height:1.7; }
+    .tech-stack { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+    .tech-chip { background:var(--dark3); border:1px solid var(--border); border-radius:20px; padding:6px 14px; font-size:13px; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <main class="page-wrap">
+    <div class="about-hero">
+      <img src="photo.jpg" class="about-photo" alt="Raju Ram"
+           onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=RajuRam'" />
+      <div class="about-name">🧑‍🏫 राजू राम</div>
+      <div class="about-title">AI Teacher — Founder & Developer | गरीब बच्चों का साथी</div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <h2 style="font-size:22px;margin-bottom:14px">🎯 हमारा Mission</h2>
+      <p style="font-size:15px;line-height:1.9;color:var(--muted)">
+        भारत के गरीब से गरीब बच्चे को भी वही शिक्षा मिले जो अमीर बच्चों को मिलती है।
+        AI की ताकत से हम free में UPSC, SSC, NEET, JEE जैसी competitive exam की तैयारी कराते हैं।
+        हिंदी में, आवाज़ में, बिना किसी fees के। यही है AI Teacher का सपना। 🇮🇳
+      </p>
+    </div>
+
+    <div class="mission-grid">
+      <div class="mission-card">
+        <div class="icon">🆓</div>
+        <h3>बिल्कुल मुफ्त</h3>
+        <p>कोई fees नहीं, कोई subscription नहीं। AI Teacher हमेशा free रहेगा।</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">🇮🇳</div>
+        <h3>हिंदी में</h3>
+        <p>हर topic हिंदी में समझाया जाता है — भारतीय examples के साथ।</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">🤖</div>
+        <h3>AI Powered</h3>
+        <p>Llama 3.3 70B जैसे latest AI models से 1000+ words की explanation।</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">🎤</div>
+        <h3>Voice Support</h3>
+        <p>बोलकर सवाल पूछो, आवाज़ में जवाब सुनो। पढ़ने में दिक्कत है? कोई बात नहीं।</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">🏆</div>
+        <h3>TeamCoin Rewards</h3>
+        <p>Quiz खेलो — TeamCoins कमाओ। पढ़ाई को game बनाओ!</p>
+      </div>
+      <div class="mission-card">
+        <div class="icon">📴</div>
+        <h3>Low Internet भी चलेगा</h3>
+        <p>Lightweight design — धीमे internet पर भी आसानी से चलेगा।</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <h2 style="font-size:20px;margin-bottom:14px">⚙️ Technology</h2>
+      <div class="tech-stack">
+        <span class="tech-chip">🤖 Groq AI (Llama 3.3 70B)</span>
+        <span class="tech-chip">🔍 Tavily Search</span>
+        <span class="tech-chip">🐍 Python Flask</span>
+        <span class="tech-chip">🌐 GitHub Pages</span>
+        <span class="tech-chip">☁️ Render Cloud</span>
+        <span class="tech-chip">🎤 Web Speech API</span>
+        <span class="tech-chip">🔊 gTTS Voice</span>
+        <span class="tech-chip">🪙 TeamCoin DAO</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:20px;margin-bottom:10px">💝 Support करो</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">
+        अगर AI Teacher से आपकी पढ़ाई में मदद हुई तो इसे अपने दोस्तों के साथ share करो।
+        Website पर advertisements से revenue आता है जिससे server चलता है।
+      </p>
+      <a href="contact.html" class="btn btn-primary">📞 Contact करो</a>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script src="nav.js"></script>
+</body>
+</html>

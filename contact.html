@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — AI Teacher</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .contact-info { background:var(--dark2); border:1px solid var(--border); border-radius:14px; padding:24px; height:fit-content; }
+    .contact-info h3 { font-size:18px; margin-bottom:16px; }
+    .contact-item { display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; }
+    .contact-item .icon { font-size:24px; flex-shrink:0; }
+    .contact-item h4 { font-size:14px; font-weight:700; margin-bottom:2px; }
+    .contact-item p  { font-size:13px; color:var(--muted); }
+    .contact-item a  { color:var(--blue); }
+    .form-card { background:var(--dark2); border:1px solid var(--border); border-radius:14px; padding:24px; }
+    .form-card h3 { font-size:18px; margin-bottom:20px; }
+    @media(max-width:768px){ .contact-grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <main class="page-wrap">
+    <div class="page-header">
+      <h1>📞 Contact करो</h1>
+      <p>कोई समस्या? सुझाव? हम सुनने को तैयार हैं!</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>📬 हमसे बात करो</h3>
+        <div class="contact-item">
+          <div class="icon">📧</div>
+          <div>
+            <h4>Email</h4>
+            <p><a href="mailto:rajuram@example.com">rajuram@example.com</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon">💬</div>
+          <div>
+            <h4>WhatsApp</h4>
+            <p>+91 XXXXX XXXXX (10 AM - 6 PM)</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon">🐙</div>
+          <div>
+            <h4>GitHub</h4>
+            <p><a href="https://github.com/rajuagi" target="_blank">github.com/rajuagi</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon">🌐</div>
+          <div>
+            <h4>Website</h4>
+            <p><a href="https://rajuagi.github.io/ai-teacher-frontend" target="_blank">AI Teacher Website</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon">⏰</div>
+          <div>
+            <h4>Response Time</h4>
+            <p>24-48 घंटे में जवाब देने की कोशिश करेंगे</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(233,69,96,0.1);border:1px solid var(--primary);border-radius:10px;padding:14px;margin-top:8px">
+          <div style="font-weight:700;margin-bottom:4px">🆘 Technical Problem?</div>
+          <div style="font-size:13px;color:var(--muted)">Quiz नहीं चल रही? Backend down है? GitHub Issues पर report करो — जल्दी fix होगा।</div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>✉️ Message भेजो</h3>
+        <div id="formAlert" class="alert"></div>
+        <div class="input-group">
+          <label class="input-label">👤 नाम</label>
+          <input class="input" id="cName" placeholder="आपका नाम" />
+        </div>
+        <div class="input-group">
+          <label class="input-label">📧 Email</label>
+          <input class="input" id="cEmail" type="email" placeholder="apna@email.com" />
+        </div>
+        <div class="input-group">
+          <label class="input-label">📋 Subject</label>
+          <select class="input" id="cSubject">
+            <option value="">Select करो...</option>
+            <option value="bug">🐛 Bug / Technical Problem</option>
+            <option value="suggestion">💡 Suggestion</option>
+            <option value="quiz">🧠 Quiz Problem</option>
+            <option value="coins">🪙 TeamCoin Issue</option>
+            <option value="other">📝 Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">💬 Message</label>
+          <textarea class="input" id="cMessage" rows="5" placeholder="विस्तार से बताओ..." style="resize:vertical"></textarea>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="submitContact()">📤 Message भेजो</button>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center">
+          Note: यह form अभी email send नहीं करता — ऊपर दिए email पर directly लिखो। जल्द ही form activate होगा।
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px;text-align:center">
+      <div style="font-size:36px;margin-bottom:10px">🙏</div>
+      <h3 style="font-size:18px;margin-bottom:8px">AI Teacher को Share करो!</h3>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">अपने गरीब दोस्तों को बताओ — यह education tool उनकी ज़िंदगी बदल सकता है।</p>
+      <button class="btn btn-primary" onclick="share()">📲 Share करो</button>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script src="nav.js"></script>
+  <script>
+    function submitContact() {
+      const name  = document.getElementById("cName").value.trim();
+      const email = document.getElementById("cEmail").value.trim();
+      const msg   = document.getElementById("cMessage").value.trim();
+      if (!name||!msg) { showAlert("formAlert","नाम और message जरूरी हैं","error"); return; }
+      showAlert("formAlert","शुक्रिया! हम जल्द reply करेंगे। 🙏 (अभी direct email पर contact करो)","info",0);
+    }
+
+    function share() {
+      const text = "🧑‍🏫 AI Teacher — हिंदी में मुफ्त शिक्षा!\nQuiz, Courses, Voice — सब free!\n👉 https://rajuagi.github.io/ai-teacher-frontend";
+      if (navigator.share) {
+        navigator.share({title:"AI Teacher",text,url:"https://rajuagi.github.io/ai-teacher-frontend"});
+      } else {
+        navigator.clipboard.writeText(text);
+        showAlert("formAlert","Link copy हो गया! अब WhatsApp पर paste करो।","success");
+      }
+    }
+  </script>
+</body>
+</html>
