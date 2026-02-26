@@ -2,7 +2,7 @@
    AI Teacher v2.0 — Shared Navigation & Helpers
    ============================================ */
 
-const BACKEND = "https://ai-teacher-backend-ngbs.onrender.com"; // ← Render URL yahan daalo
+const BACKEND = "https://ai-teacher-backend-v2.onrender.com"; // ← Render URL yahan daalo
 
 // ===== AUTH =====
 function getToken()    { return localStorage.getItem("at_token"); }
